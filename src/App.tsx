@@ -8,10 +8,12 @@ function App() {
   return (
     <Router>
       <ThemeProvider>
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors">
+        <div className="min-h-screen bg-gradient-to-br from-primary to-secondary dark:from-gray-900 dark:to-gray-800 transition-colors">
           <Header />
-          <main className="container mx-auto px-4 py-8">
-            <HomePage />
+          <main className="container mx-auto px-6 py-10">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-3xl p-10 transition-shadow hover:shadow-3xl">
+              <HomePage />
+            </div>
           </main>
         </div>
       </ThemeProvider>
@@ -19,4 +21,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

@@ -21,7 +21,6 @@ const HomePage: React.FC = () => {
       setLoading(true);
       setError(null);
       const response = await getNews(category, currentPage, searchQuery);
-      
       if (response.status === 'ok' && Array.isArray(response.articles)) {
         setArticles(response.articles);
         setTotalPages(Math.ceil(response.totalResults / 12));
@@ -57,7 +56,7 @@ const HomePage: React.FC = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="bg-red-50 dark:bg-red-900/20 p-8 rounded-2xl text-center max-w-lg">
+        <div className="bg-red-50 dark:bg-red-900/20 p-8 rounded-3xl shadow-lg text-center max-w-lg">
           <p className="text-red-600 dark:text-red-400 text-lg mb-4">{error}</p>
           <button
             onClick={fetchNews}
@@ -71,16 +70,20 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div>
-      <SearchBar onSearch={handleSearch} />
-      <CategoryFilter
-        selectedCategory={category}
-        onCategoryChange={handleCategoryChange}
-      />
-      
+    <div className="space-y-8">
+      {/* Barre de recherche et filtres */}
+      <div className="flex flex-col md:flex-row justify-between gap-6">
+        <SearchBar onSearch={handleSearch} />
+        <CategoryFilter
+          selectedCategory={category}
+          onCategoryChange={handleCategoryChange}
+        />
+      </div>
+
+      {/* Contenu principal */}
       {loading ? (
         <div className="flex justify-center items-center min-h-[400px]">
-          <Loader2 className="h-12 w-12 text-blue-600 dark:text-blue-400 animate-spin" />
+          <Loader2 className="h-16 w-16 text-primary animate-spin" />
         </div>
       ) : (
         <>
@@ -89,13 +92,14 @@ const HomePage: React.FC = () => {
               <p className="text-gray-600 dark:text-gray-400 text-lg">Aucun article trouvé</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
               {articles.map((article, index) => (
                 <NewsCard key={`${article.url}-${index}`} article={article} />
               ))}
             </div>
           )}
-          
+
+          {/* Pagination */}
           {articles.length > 0 && (
             <Pagination
               currentPage={currentPage}
