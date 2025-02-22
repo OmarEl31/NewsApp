@@ -5,6 +5,7 @@ import NewsCard from '../components/NewsCard';
 import CategoryFilter from '../components/CategoryFilter';
 import SearchBar from '../components/SearchBar';
 import Pagination from '../components/Pagination';
+import { Loader2 } from 'lucide-react';
 
 const HomePage: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -21,18 +22,18 @@ const HomePage: React.FC = () => {
       setError(null);
       const response = await getNews(category, currentPage, searchQuery);
       
-      console.log("📰 Articles reçus :", response.articles);
-      
-      if (response.articles.length === 0) {
-        console.warn("⚠️ Aucun article récupéré depuis l'API !");
+      if (response.status === 'ok' && Array.isArray(response.articles)) {
+        setArticles(response.articles);
+        setTotalPages(Math.ceil(response.totalResults / 12));
+      } else {
+        setError('Format de réponse invalide');
+        setArticles([]);
+        setTotalPages(1);
       }
-      
-      setArticles(response.articles);
-      setTotalPages(Math.ceil(response.totalResults / 12));
     } catch (err) {
       setArticles([]);
       setTotalPages(1);
-      setError(err instanceof Error ? err.message : "Failed to fetch news.");
+      setError(err instanceof Error ? err.message : 'Erreur lors de la récupération des actualités');
     } finally {
       setLoading(false);
     }
@@ -53,38 +54,54 @@ const HomePage: React.FC = () => {
     setSearchQuery('');
   };
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="bg-red-50 dark:bg-red-900/20 p-8 rounded-2xl text-center max-w-lg">
+          <p className="text-red-600 dark:text-red-400 text-lg mb-4">{error}</p>
+          <button
+            onClick={fetchNews}
+            className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium"
+          >
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <SearchBar onSearch={handleSearch} />
-      <CategoryFilter selectedCategory={category} onCategoryChange={handleCategoryChange} />
+      <CategoryFilter
+        selectedCategory={category}
+        onCategoryChange={handleCategoryChange}
+      />
       
-      {error && (
-        <div className="text-center mt-8 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
-          <button onClick={fetchNews} className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-            Try Again
-          </button>
-        </div>
-      )}
-
       {loading ? (
         <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+          <Loader2 className="h-12 w-12 text-blue-600 dark:text-blue-400 animate-spin" />
         </div>
       ) : (
         <>
           {articles.length === 0 ? (
-            <p className="text-center text-gray-500">Aucun article trouvé.</p>
+            <div className="text-center mt-12">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">Aucun article trouvé</p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {articles.map((article, index) => (
                 <NewsCard key={`${article.url}-${index}`} article={article} />
               ))}
             </div>
           )}
-
+          
           {articles.length > 0 && (
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           )}
         </>
       )}
