@@ -30,7 +30,7 @@ const Header: React.FC = () => {
               theme === 'light' ? 'text-blue-900' : 'text-white'
             }`}
           >
-            News<span className="text-accent">Hub</span>
+            News<span className="text-accent">App</span>
           </span>
         </Link>
 
